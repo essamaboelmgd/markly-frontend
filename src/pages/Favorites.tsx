@@ -89,10 +89,10 @@ export default function Favorites() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 animate-fade-up">
+      <div className="space-y-6 animate-fade-up w-full max-w-full">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Favorite Bookmarks</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Favorite Bookmarks</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             Your most important bookmarks in one place
           </p>
         </div>
@@ -103,27 +103,27 @@ export default function Favorites() {
             <p className="text-muted-foreground">Loading favorites...</p>
           </div>
         ) : favorites.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {favorites.map((bookmark) => (
               <Card
                 key={bookmark.id}
-                className="p-6 hover:shadow-lg transition-all duration-300 border-warning/30 cursor-pointer"
+                className="p-4 md:p-6 hover:shadow-lg transition-all duration-300 border-warning/30 cursor-pointer"
                 onClick={() => navigate(`/dashboard/bookmarks/${bookmark.id}`)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="p-2 rounded-lg bg-warning/10">
                     <Star className="h-4 w-4 text-warning fill-warning" />
                   </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </div>
-                <h3 className="font-semibold mb-2 line-clamp-2">
+                <h3 className="font-semibold mb-2 line-clamp-2 text-sm md:text-base">
                   {bookmark.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-1">
+                <p className="text-xs md:text-sm text-muted-foreground mb-3 line-clamp-1">
                   {bookmark.url}
                 </p>
                 {bookmark.summary && (
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  <p className="text-xs md:text-sm text-muted-foreground mb-3 line-clamp-2">
                     {bookmark.summary}
                   </p>
                 )}
@@ -138,18 +138,18 @@ export default function Favorites() {
                 )}
                 
                 {/* Display tags */}
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-1 md:gap-2 mb-3">
                   {bookmark.tags?.slice(0, 3).map((tagId: string, i: number) => (
-                    <Badge key={i} variant="secondary" className="text-xs">
+                    <Badge key={i} variant="secondary" className="text-xs px-2 py-1">
                       {getTagName(tagId)}
                     </Badge>
                   ))}
                 </div>
                 
                 {/* Display collections */}
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-1 md:gap-2 mb-3">
                   {bookmark.collections?.slice(0, 2).map((collectionId: string, i: number) => (
-                    <Badge key={i} variant="outline" className="text-xs">
+                    <Badge key={i} variant="outline" className="text-xs px-2 py-1">
                       {getCollectionName(collectionId)}
                     </Badge>
                   ))}
@@ -158,7 +158,7 @@ export default function Favorites() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full rounded-full"
+                  className="w-full rounded-full text-xs md:text-sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleSummarize(bookmark.id);
@@ -168,12 +168,12 @@ export default function Favorites() {
                   {summarizingId === bookmark.id ? (
                     <>
                       <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2"></div>
-                      Generating...
+                      <span className="truncate">Generating...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-3 w-3 mr-2" />
-                      AI Summary
+                      <span className="truncate">AI Summary</span>
                     </>
                   )}
                 </Button>
@@ -181,12 +181,12 @@ export default function Favorites() {
             ))}
           </div>
         ) : (
-          <Card className="p-12 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center mb-4">
-              <Star className="h-8 w-8 text-warning" />
+          <Card className="p-8 md:p-12 text-center">
+            <div className="mx-auto w-12 h-12 md:w-16 md:h-16 rounded-full bg-warning/10 flex items-center justify-center mb-4">
+              <Star className="h-6 w-6 md:h-8 md:w-8 text-warning" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No favorites yet</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-lg md:text-xl font-semibold mb-2">No favorites yet</h3>
+            <p className="text-muted-foreground text-sm md:text-base">
               Star your important bookmarks to see them here
             </p>
           </Card>
