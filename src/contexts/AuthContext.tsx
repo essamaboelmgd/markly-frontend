@@ -14,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -53,6 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: "Welcome back!",
         description: "You've successfully logged in.",
       });
+      
+      // Add a small delay to ensure state is updated before resolving
+      await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -63,9 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await authApi.register(name, email, password);
+      const response = await authApi.register(username, email, password);
       localStorage.setItem("auth_token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
       setUser(response.user);

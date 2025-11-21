@@ -83,8 +83,8 @@ export const authApi = {
   login: (email: string, password: string) =>
     api.post<{ token: string; user: any }>("/api/auth/login", { email, password }),
   
-  register: (name: string, email: string, password: string) =>
-    api.post<{ token: string; user: any }>("/api/auth/register", { name, email, password }),
+  register: (username: string, email: string, password: string) =>
+    api.post<{ token: string; user: any }>("/api/auth/register", { username, email, password }),
 };
 
 // Bookmark APIs

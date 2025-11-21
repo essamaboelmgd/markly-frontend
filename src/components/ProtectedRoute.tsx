@@ -21,6 +21,8 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   }
 
   if (!isAuthenticated) {
+    // Log for debugging purposes
+    console.log("User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
@@ -28,5 +30,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Log for debugging purposes
+  console.log("User authenticated, allowing access to protected route");
   return <>{children}</>;
 }

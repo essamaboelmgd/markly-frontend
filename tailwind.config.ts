@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
@@ -141,11 +141,51 @@ export default {
           },
         },
         "float": {
-          "0%, 100%": {
-            transform: "translateY(0px)",
+          "0%": {
+            transform: "translateY(0px) rotate(3deg)",
           },
           "50%": {
-            transform: "translateY(-20px)",
+            transform: "translateY(-10px) rotate(3deg)",
+          },
+          "100%": {
+            transform: "translateY(0px) rotate(3deg)",
+          },
+        },
+        "float-delayed": {
+          "0%": {
+            transform: "translateY(0px) rotate(-2deg)",
+          },
+          "50%": {
+            transform: "translateY(-15px) rotate(-2deg)",
+          },
+          "100%": {
+            transform: "translateY(0px) rotate(-2deg)",
+          },
+        },
+        "float-delayed-2": {
+          "0%": {
+            transform: "translateY(0px) translateX(-50%) rotate(1deg)",
+          },
+          "50%": {
+            transform: "translateY(-5px) translateX(-50%) rotate(1deg)",
+          },
+          "100%": {
+            transform: "translateY(0px) translateX(-50%) rotate(1deg)",
+          },
+        },
+        // Added blob animation for hero section
+        "blob": {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)",
           },
         },
       },
@@ -156,9 +196,15 @@ export default {
         "fade-up": "fade-up 0.6s ease-out",
         "slide-in-right": "slide-in-right 0.4s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
-        "float": "float 3s ease-in-out infinite",
+        "float": "float 4s ease-in-out infinite",
+        "float-delayed": "float-delayed 4s ease-in-out infinite 0.5s",
+        "float-delayed-2": "float-delayed-2 4s ease-in-out infinite 1s",
+        // Added blob animation
+        "blob": "blob 7s infinite ease-in-out",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+};
+
+export default config;
