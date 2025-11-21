@@ -27,6 +27,14 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
+      // If unauthorized, clear auth tokens
+      if (response.status === 401) {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
+        // Redirect to login page
+        window.location.href = "/login";
+      }
+      
       const error: ApiError = {
         message: await response.text() || "An error occurred",
         status: response.status,
@@ -81,15 +89,25 @@ export const api = new ApiClient(API_URL);
 // Auth APIs
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ token: string; user: any }>("/api/auth/login", { email, password }),
+    api.post<{ token: string }>("/api/auth/login", { email, password }),
   
   register: (username: string, email: string, password: string) =>
-    api.post<{ token: string; user: any }>("/api/auth/register", { username, email, password }),
+    api.post<{ token: string }>("/api/auth/register", { username, email, password }),
+  
+  getProfile: () => 
+    api.get<{ id: string; username: string; email: string }>("/api/me"),
 };
 
 // Bookmark APIs
 export const bookmarkApi = {
-  getAll: () => api.get<any[]>("/api/bookmarks"),
+  getAll: (params?: Record<string, string>) => {
+    let url = "/api/bookmarks";
+    if (params) {
+      const queryParams = new URLSearchParams(params);
+      url += `?${queryParams.toString()}`;
+    }
+    return api.get<any[]>(url);
+  },
   getById: (id: string) => api.get<any>(`/api/bookmarks/${id}`),
   create: (data: any) => api.post<any>("/api/bookmarks", data),
   update: (id: string, data: any) => api.put<any>(`/api/bookmarks/${id}`, data),

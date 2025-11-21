@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import Bookmarks from "./pages/Bookmarks";
+import BookmarkDetail from "./pages/BookmarkDetail";
 import Favorites from "./pages/Favorites";
 import Categories from "./pages/Categories";
 import Collections from "./pages/Collections";
@@ -49,6 +50,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Bookmarks />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/bookmarks/:id"
+                element={
+                  <ProtectedRoute>
+                    <BookmarkDetail />
                   </ProtectedRoute>
                 }
               />

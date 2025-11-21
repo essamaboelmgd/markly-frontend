@@ -3,32 +3,87 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { bookmarkApi } from "@/lib/api";
+import { bookmarkApi, categoryApi, collectionApi, tagApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Star, ExternalLink, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [tags, setTags] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [summarizingId, setSummarizingId] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadFavorites();
+    loadAllData();
   }, []);
 
-  const loadFavorites = async () => {
+  const loadAllData = async () => {
     try {
-      const bookmarks = await bookmarkApi.getAll();
-      const favs = bookmarks.filter((b: any) => b.isFavorite);
+      // Load favorites
+      const favs = await bookmarkApi.getAll({ isFav: "true" });
+      
+      // Load tags, categories, and collections
+      const [tagData, categoryData, collectionData] = await Promise.all([
+        tagApi.getUserTags(),
+        categoryApi.getAll(),
+        collectionApi.getAll()
+      ]);
+      
+      setTags(tagData);
+      setCategories(categoryData);
+      setCollections(collectionData);
       setFavorites(favs);
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error loading favorites",
+        title: "Error loading data",
         description: error.message,
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Helper functions to get names by ID
+  const getTagName = (tagId: string) => {
+    const tag = tags.find(t => t.id === tagId);
+    return tag ? tag.name : tagId;
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    return category ? (category.emoji ? `${category.emoji} ${category.name}` : category.name) : categoryId;
+  };
+
+  const getCollectionName = (collectionId: string) => {
+    const collection = collections.find(c => c.id === collectionId);
+    return collection ? collection.name : collectionId;
+  };
+
+  const handleSummarize = async (bookmarkId: string) => {
+    setSummarizingId(bookmarkId);
+    try {
+      const response = await bookmarkApi.summarize(bookmarkId);
+      // Update the bookmark with the new summary
+      setFavorites(prev => prev.map(b => 
+        b.id === bookmarkId ? { ...b, summary: response.summary } : b
+      ));
+      
+      // Navigate to the bookmark detail page
+      navigate(`/dashboard/bookmarks/${bookmarkId}`);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error generating summary",
+        description: error.message,
+      });
+    } finally {
+      setSummarizingId(null);
     }
   };
 
@@ -52,7 +107,8 @@ export default function Favorites() {
             {favorites.map((bookmark) => (
               <Card
                 key={bookmark.id}
-                className="p-6 hover:shadow-lg transition-all duration-300 border-warning/30"
+                className="p-6 hover:shadow-lg transition-all duration-300 border-warning/30 cursor-pointer"
+                onClick={() => navigate(`/dashboard/bookmarks/${bookmark.id}`)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="p-2 rounded-lg bg-warning/10">
@@ -66,25 +122,60 @@ export default function Favorites() {
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-1">
                   {bookmark.url}
                 </p>
-                {bookmark.description && (
+                {bookmark.summary && (
                   <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {bookmark.description}
+                    {bookmark.summary}
                   </p>
                 )}
+                
+                {/* Display category */}
+                {bookmark.category && (
+                  <div className="mb-2">
+                    <Badge variant="outline" className="text-xs">
+                      {getCategoryName(bookmark.category)}
+                    </Badge>
+                  </div>
+                )}
+                
+                {/* Display tags */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {bookmark.tags?.slice(0, 3).map((tag: string, i: number) => (
+                  {bookmark.tags?.slice(0, 3).map((tagId: string, i: number) => (
                     <Badge key={i} variant="secondary" className="text-xs">
-                      {tag}
+                      {getTagName(tagId)}
                     </Badge>
                   ))}
                 </div>
+                
+                {/* Display collections */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {bookmark.collections?.slice(0, 2).map((collectionId: string, i: number) => (
+                    <Badge key={i} variant="outline" className="text-xs">
+                      {getCollectionName(collectionId)}
+                    </Badge>
+                  ))}
+                </div>
+                
                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSummarize(bookmark.id);
+                  }}
+                  disabled={summarizingId === bookmark.id}
                 >
-                  <Sparkles className="h-3 w-3 mr-2" />
-                  AI Summary
+                  {summarizingId === bookmark.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2"></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3 w-3 mr-2" />
+                      AI Summary
+                    </>
+                  )}
                 </Button>
               </Card>
             ))}

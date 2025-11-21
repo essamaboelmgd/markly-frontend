@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface User {
   id: string;
-  name: string;
+  username: string;
   email: string;
   role?: string;
 }
@@ -28,35 +28,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check if user is already logged in
     const token = localStorage.getItem("auth_token");
-    const savedUser = localStorage.getItem("user");
     
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("user");
-      }
+    if (token) {
+      // Try to fetch user profile
+      fetchUserProfile();
+    } else {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const profile = await authApi.getProfile();
+      setUser(profile);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      // If there's an error fetching profile, clear auth tokens
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
+      // First, login to get the token
       const response = await authApi.login(email, password);
-      localStorage.setItem("auth_token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-      setUser(response.user);
+      console.log("Login response:", response);
       
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
-      
-      // Add a small delay to ensure state is updated before resolving
-      await new Promise(resolve => setTimeout(resolve, 100));
+      if (response.token) {
+        localStorage.setItem("auth_token", response.token);
+        
+        // Now fetch the user profile
+        await fetchUserProfile();
+        
+        toast({
+          title: "Welcome back!",
+          description: "You've successfully logged in.",
+        });
+      } else {
+        throw new Error("Login failed: No token received");
+      }
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Login failed",
@@ -68,16 +83,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (username: string, email: string, password: string) => {
     try {
+      // First, register to get the token
       const response = await authApi.register(username, email, password);
-      localStorage.setItem("auth_token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-      setUser(response.user);
+      console.log("Register response:", response);
       
-      toast({
-        title: "Account created!",
-        description: "Welcome to Markly!",
-      });
+      if (response.token) {
+        localStorage.setItem("auth_token", response.token);
+        
+        // Now fetch the user profile
+        await fetchUserProfile();
+        
+        toast({
+          title: "Account created!",
+          description: "Welcome to Markly!",
+        });
+      } else {
+        throw new Error("Registration failed: No token received");
+      }
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast({
         variant: "destructive",
         title: "Registration failed",

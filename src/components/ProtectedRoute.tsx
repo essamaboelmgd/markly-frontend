@@ -1,4 +1,5 @@
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
@@ -8,6 +9,17 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Log authentication status for debugging
+  useEffect(() => {
+    console.log("ProtectedRoute - Auth Status:", { 
+      isAuthenticated, 
+      isLoading, 
+      user,
+      pathname: location.pathname
+    });
+  }, [isAuthenticated, isLoading, user, location.pathname]);
 
   if (isLoading) {
     return (
@@ -21,16 +33,15 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   }
 
   if (!isAuthenticated) {
-    // Log for debugging purposes
     console.log("User not authenticated, redirecting to login");
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requireAdmin && user?.role !== "admin" && user?.role !== "superadmin") {
+    console.log("User not authorized for admin, redirecting to dashboard");
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Log for debugging purposes
   console.log("User authenticated, allowing access to protected route");
   return <>{children}</>;
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { bookmarkApi, categoryApi, collectionApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 import { Bookmark, Star, FolderOpen, Layers, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,32 +16,42 @@ export default function Dashboard() {
   const [recentBookmarks, setRecentBookmarks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    if (isAuthenticated) {
+      loadDashboardData();
+    }
+  }, [isAuthenticated]);
 
   const loadDashboardData = async () => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      setIsLoading(true);
       const [bookmarks, categories, collections] = await Promise.all([
-        bookmarkApi.getAll(),
-        categoryApi.getAll(),
-        collectionApi.getAll(),
+        bookmarkApi.getAll().catch(() => []),
+        categoryApi.getAll().catch(() => []),
+        collectionApi.getAll().catch(() => []),
       ]);
 
       setStats({
-        totalBookmarks: bookmarks.length,
-        favorites: bookmarks.filter((b: any) => b.isFavorite).length,
-        categories: categories.length,
-        collections: collections.length,
+        totalBookmarks: Array.isArray(bookmarks) ? bookmarks.length : 0,
+        favorites: Array.isArray(bookmarks) ? bookmarks.filter((b: any) => b.is_fav).length : 0,
+        categories: Array.isArray(categories) ? categories.length : 0,
+        collections: Array.isArray(collections) ? collections.length : 0,
       });
 
-      setRecentBookmarks(bookmarks.slice(0, 5));
+      setRecentBookmarks(Array.isArray(bookmarks) ? bookmarks.slice(0, 5) : []);
     } catch (error: any) {
+      console.error("Error loading dashboard data:", error);
       toast({
         variant: "destructive",
         title: "Error loading dashboard",
-        description: error.message,
+        description: error.message || "Failed to load dashboard data",
       });
     } finally {
       setIsLoading(false);
@@ -77,6 +88,10 @@ export default function Dashboard() {
       bg: "bg-success/10",
     },
   ];
+
+  if (!isAuthenticated) {
+    return null; // or redirect to login
+  }
 
   return (
     <DashboardLayout>
@@ -131,11 +146,11 @@ export default function Dashboard() {
                       <Bookmark className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{bookmark.title}</p>
-                      <p className="text-sm text-muted-foreground">{bookmark.url}</p>
+                      <p className="font-medium">{bookmark.title || "Untitled"}</p>
+                      <p className="text-sm text-muted-foreground">{bookmark.url || "No URL"}</p>
                     </div>
                   </div>
-                  {bookmark.isFavorite && (
+                  {bookmark.is_fav && (
                     <Star className="h-4 w-4 text-warning fill-warning" />
                   )}
                 </div>

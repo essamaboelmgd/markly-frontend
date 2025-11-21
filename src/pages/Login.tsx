@@ -14,8 +14,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // If user is already authenticated, redirect to dashboard
+  if (isAuthenticated) {
+    navigate("/dashboard", { replace: true });
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +29,8 @@ export default function Login() {
 
     try {
       await login(email, password);
-      // Ensure navigation happens after successful login
-      navigate("/dashboard", { replace: true });
+      // Navigation should happen automatically through ProtectedRoute
+      console.log("Login successful, navigating to dashboard");
     } catch (error) {
       // Error handled by auth context
       console.error("Login error:", error);
