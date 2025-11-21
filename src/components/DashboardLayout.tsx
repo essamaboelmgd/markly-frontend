@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,8 +27,9 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  X,
+  Sparkles,
 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
@@ -40,6 +41,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
+  // Close mobile sidebar when resizing to larger screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -52,6 +66,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { icon: Home, label: "Dashboard", path: "/dashboard" },
     { icon: Bookmark, label: "All Bookmarks", path: "/dashboard/bookmarks" },
     { icon: Star, label: "Favorites", path: "/dashboard/favorites" },
+    { icon: Sparkles, label: "AI Suggested", path: "/dashboard/ai-suggested" },
     { icon: FolderOpen, label: "Categories", path: "/dashboard/categories" },
     { icon: Layers, label: "Collections", path: "/dashboard/collections" },
     { icon: Tag, label: "Tags", path: "/dashboard/tags" },
@@ -66,11 +81,21 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen flex bg-background">
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+      
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-screen bg-card border-r transition-all duration-300 z-40",
-          sidebarCollapsed ? "w-16" : "w-64"
+          "fixed left-0 top-0 h-screen bg-card border-r transition-all duration-300 z-50",
+          "md:z-40",
+          sidebarCollapsed ? "w-16" : "w-64",
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         <div className="h-full flex flex-col">
@@ -90,7 +115,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="rounded-full"
+              className="rounded-full hidden md:flex"
             >
               {sidebarCollapsed ? (
                 <ChevronRight className="h-4 w-4" />
@@ -98,12 +123,24 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <ChevronLeft className="h-4 w-4" />
               )}
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="rounded-full md:hidden"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Main Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {mainNavItems.map((item) => (
-              <Link key={item.path} to={item.path}>
+              <Link 
+                key={item.path} 
+                to={item.path}
+                onClick={() => setMobileSidebarOpen(false)}
+              >
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   className={cn(
@@ -112,7 +149,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  {!sidebarCollapsed && <span>{item.label}</span>}
+                  {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                 </Button>
               </Link>
             ))}
@@ -120,7 +157,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {isAdmin && (
               <>
                 <div className="my-4 border-t" />
-                <Link to="/admin">
+                <Link 
+                  to="/admin"
+                  onClick={() => setMobileSidebarOpen(false)}
+                >
                   <Button
                     variant={isActive("/admin") ? "secondary" : "ghost"}
                     className={cn(
@@ -139,7 +179,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Bottom Navigation */}
           <div className="p-4 border-t space-y-1">
             {bottomNavItems.map((item) => (
-              <Link key={item.path} to={item.path}>
+              <Link 
+                key={item.path} 
+                to={item.path}
+                onClick={() => setMobileSidebarOpen(false)}
+              >
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   className={cn(
@@ -148,14 +192,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  {!sidebarCollapsed && <span>{item.label}</span>}
+                  {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                 </Button>
               </Link>
             ))}
             <Button
               variant="ghost"
               className="w-full justify-start gap-3 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={handleLogout}
+              onClick={() => {
+                handleLogout();
+                setMobileSidebarOpen(false);
+              }}
             >
               <LogOut className="h-5 w-5 shrink-0" />
               {!sidebarCollapsed && <span>Logout</span>}
@@ -167,41 +214,52 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div
         className={cn(
-          "flex-1 flex flex-col transition-all duration-300",
-          sidebarCollapsed ? "ml-16" : "ml-64"
+          "flex-1 flex flex-col transition-all duration-300 w-full",
+          sidebarCollapsed ? "md:ml-16" : "md:ml-64",
+          "ml-0" // Always 0 on mobile since sidebar overlays
         )}
       >
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b px-6 py-4">
+        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b px-4 py-3 md:px-6 md:py-4">
           <div className="flex items-center justify-between">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden rounded-full"
+              onClick={() => setMobileSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            
             {/* Search */}
-            <div className="flex-1 max-w-md">
+            <div className="flex-1 max-w-md mx-2 md:mx-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search bookmarks..."
-                  className="pl-10 rounded-full"
+                  className="pl-10 rounded-full text-sm md:text-base"
                 />
               </div>
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <ThemeToggle />
-
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-gradient-primary text-white">
-                        {user?.name?.charAt(0) || "U"}
+                        {user?.username?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <div className="px-2 py-1.5">
-                    <p className="font-medium">{user?.name}</p>
+                    <p className="font-medium">{user?.username}</p>
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                   <DropdownMenuSeparator />
@@ -222,8 +280,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6">{children}</main>
+        {/* Page Content - Added max-width and padding adjustments for mobile */}
+        <main className="flex-1 p-4 md:p-6 w-full max-w-full overflow-x-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

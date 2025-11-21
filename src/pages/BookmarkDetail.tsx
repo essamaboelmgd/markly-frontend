@@ -349,45 +349,47 @@ export default function BookmarkDetail() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 animate-fade-up">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 animate-fade-up w-full max-w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Bookmark Details</h1>
-            <p className="text-muted-foreground">View and manage your bookmark details</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Bookmark Details</h1>
+            <p className="text-muted-foreground text-sm md:text-base">View and manage your bookmark details</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setIsEditModalOpen(true)}>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setIsEditModalOpen(true)} className="w-full sm:w-auto">
               <Pencil className="w-4 h-4 mr-2" />
               Edit Bookmark
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/dashboard/bookmarks")}
+              className="w-full sm:w-auto"
             >
               Back to Bookmarks
             </Button>
           </div>
         </div>
 
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">{bookmark.title}</h1>
+        <Card className="p-4 md:p-6 w-full max-w-full">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div className="w-full md:w-auto">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 break-words">{bookmark.title}</h1>
               <a
                 href={bookmark.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline flex items-center gap-1 text-lg"
+                className="text-primary hover:underline flex items-center gap-1 text-base md:text-lg break-all"
               >
-                <ExternalLink className="w-4 h-4" />
-                {bookmark.url}
+                <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">{bookmark.url}</span>
               </a>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 onClick={handleToggleFavorite}
                 variant={bookmark.is_fav ? "default" : "outline"}
                 size="sm"
+                className="flex-1 md:flex-none"
               >
                 <Star
                   className={`w-4 h-4 ${bookmark.is_fav ? "fill-current" : ""}`}
@@ -398,6 +400,7 @@ export default function BookmarkDetail() {
                 variant="outline"
                 size="sm"
                 disabled={summarizing}
+                className="flex-1 md:flex-none"
               >
                 <Brain className="w-4 h-4 mr-2" />
                 {summarizing ? "Summarizing..." : "AI Summary"}
@@ -406,7 +409,7 @@ export default function BookmarkDetail() {
           </div>
 
           {/* Summary/Description */}
-          <div className="prose max-w-none text-foreground mb-8">
+          <div className="prose max-w-none text-foreground mb-6 md:mb-8 break-words">
             {summarizing ? (
               <p className="text-primary italic">Generating summary...</p>
             ) : bookmark.summary ? (
@@ -418,7 +421,7 @@ export default function BookmarkDetail() {
 
           {/* Category */}
           {displayCategory && (
-            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+            <div className="flex items-center gap-2 bg-secondary text-secondary-foreground px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm font-medium mb-4 md:mb-6 w-fit">
               <BookOpen className="w-4 h-4" />
               Category: {displayCategory.emoji} {displayCategory.name}
             </div>
@@ -426,13 +429,13 @@ export default function BookmarkDetail() {
 
           {/* Collections */}
           {bookmark.collections && bookmark.collections.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">Collections:</h3>
+            <div className="mb-4 md:mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2 md:mb-3">Collections:</h3>
               <div className="flex flex-wrap gap-2">
                 {bookmark.collections.map((col) => (
                   <span
                     key={col.id}
-                    className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
+                    className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 md:px-3 md:py-1 rounded-full text-sm"
                   >
                     <Folder className="w-3 h-3" />
                     {col.name}
@@ -444,13 +447,13 @@ export default function BookmarkDetail() {
 
           {/* Tags */}
           {bookmark.tags && bookmark.tags.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-foreground mb-3">Tags:</h3>
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg font-semibold text-foreground mb-2 md:mb-3">Tags:</h3>
               <div className="flex flex-wrap gap-2">
                 {bookmark.tags.map((tag) => (
                   <span
                     key={tag.id}
-                    className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
+                    className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 md:px-3 md:py-1 rounded-full text-sm"
                   >
                     <Tags className="w-3 h-3" />
                     {tag.name}
@@ -461,9 +464,9 @@ export default function BookmarkDetail() {
           )}
 
           {/* Metadata */}
-          <div className="flex items-center text-sm text-muted-foreground pt-6 border-t border-border">
-            <Calendar className="w-4 h-4 mr-2" />
-            Added on: {formatDateTime(bookmark.created_at)}
+          <div className="flex items-center text-sm text-muted-foreground pt-4 md:pt-6 border-t border-border">
+            <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Added on: {formatDateTime(bookmark.created_at)}</span>
           </div>
         </Card>
 
@@ -488,7 +491,7 @@ export default function BookmarkDetail() {
 
       {/* Edit Bookmark Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Bookmark</DialogTitle>
           </DialogHeader>
@@ -521,6 +524,7 @@ export default function BookmarkDetail() {
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Optional description or notes"
+                className="min-h-[80px]"
               />
             </div>
             <div>
@@ -650,18 +654,19 @@ export default function BookmarkDetail() {
               />
               <Label htmlFor="edit-isFav">Mark as Favorite</Label>
             </div>
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditModalOpen(false)}
                 disabled={editLoading}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="bg-gradient-primary"
+                className="bg-gradient-primary w-full sm:w-auto"
                 disabled={editLoading || !url.trim() || !title.trim()}
               >
                 {editLoading ? "Updating..." : "Update Bookmark"}

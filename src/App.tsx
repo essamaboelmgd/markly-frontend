@@ -19,6 +19,7 @@ import Collections from "./pages/Collections";
 import Tags from "./pages/Tags";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import AISuggested from "./pages/AISuggested";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -106,6 +107,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/ai-suggested"
+                element={
+                  <ProtectedRoute>
+                    <AISuggested />
                   </ProtectedRoute>
                 }
               />

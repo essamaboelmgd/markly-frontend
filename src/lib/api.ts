@@ -132,3 +132,8 @@ export const tagApi = {
   getUserTags: () => api.get<any[]>("/api/tags/user"),
   create: (data: any) => api.post<any>("/api/tags", data),
 };
+
+// Agent APIs
+export const agentApi = {
+  getSuggestions: () => api.get<any[]>("/api/agent/suggestions"),
+};

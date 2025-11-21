@@ -491,7 +491,7 @@ export default function Bookmarks() {
                 Add Bookmark
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Bookmark</DialogTitle>
               </DialogHeader>
@@ -523,6 +523,7 @@ export default function Bookmarks() {
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
                     placeholder="Optional description or notes"
+                    className="min-h-[80px]"
                   />
                 </div>
                 <div>
@@ -938,7 +939,7 @@ export default function Bookmarks() {
           setEditingBookmark(null);
         }
       }}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Bookmark</DialogTitle>
           </DialogHeader>
@@ -971,6 +972,7 @@ export default function Bookmarks() {
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Optional description or notes"
+                className="min-h-[80px]"
               />
             </div>
             <div>

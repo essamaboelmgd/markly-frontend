@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Settings as SettingsIcon, Bell, Lock, Palette, Database } from "lucide-react";
 
+// Overlay component for "Coming Soon" sections
+const ComingSoonOverlay = () => (
+  <div className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+      <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
+      <p className="text-muted-foreground">This feature is under development</p>
+    </div>
+  </div>
+);
+
 export default function Settings() {
   return (
     <DashboardLayout>
@@ -18,7 +28,8 @@ export default function Settings() {
         </div>
 
         {/* Notifications */}
-        <Card className="p-6">
+        <Card className="p-6 relative">
+          <ComingSoonOverlay />
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-primary/10">
               <Bell className="h-5 w-5 text-primary" />
@@ -49,7 +60,8 @@ export default function Settings() {
         </Card>
 
         {/* Privacy */}
-        <Card className="p-6">
+        <Card className="p-6 relative">
+          <ComingSoonOverlay />
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-primary/10">
               <Lock className="h-5 w-5 text-primary" />
@@ -80,7 +92,8 @@ export default function Settings() {
         </Card>
 
         {/* Appearance */}
-        <Card className="p-6">
+        <Card className="p-6 relative">
+          <ComingSoonOverlay />
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-primary/10">
               <Palette className="h-5 w-5 text-primary" />
@@ -110,7 +123,7 @@ export default function Settings() {
           </div>
         </Card>
 
-        {/* Data Management */}
+        {/* Data Management - No overlay */}
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-primary/10">

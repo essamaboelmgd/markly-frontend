@@ -95,28 +95,28 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 animate-fade-up">
+      <div className="space-y-6 animate-fade-up w-full max-w-full overflow-x-hidden">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Dashboard</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             Welcome back! Here's an overview of your bookmarks.
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Grid - Responsive for mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-full">
           {statCards.map((stat, index) => (
             <Card
               key={index}
-              className="p-6 hover:shadow-lg transition-all duration-300"
+              className="p-4 md:p-6 hover:shadow-lg transition-all duration-300 w-full"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground mb-1">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-xl ${stat.bg}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                <div className={`p-2 md:p-3 rounded-xl ${stat.bg}`}>
+                  <stat.icon className={`h-5 w-5 md:h-6 md:w-6 ${stat.color}`} />
                 </div>
               </div>
             </Card>
@@ -124,48 +124,48 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Bookmarks */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Recent Bookmarks</h2>
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+        <Card className="p-4 md:p-6 w-full max-w-full">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-lg md:text-xl font-semibold">Recent Bookmarks</h2>
+            <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           </div>
 
           {isLoading ? (
-            <div className="text-center text-muted-foreground py-8">
+            <div className="text-center text-muted-foreground py-6 md:py-8">
               Loading bookmarks...
             </div>
           ) : recentBookmarks.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 w-full max-w-full">
               {recentBookmarks.map((bookmark) => (
                 <div
                   key={bookmark.id}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors w-full max-w-full"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                       <Bookmark className="h-4 w-4 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">{bookmark.title || "Untitled"}</p>
-                      <p className="text-sm text-muted-foreground">{bookmark.url || "No URL"}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm md:text-base truncate">{bookmark.title || "Untitled"}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground truncate">{bookmark.url || "No URL"}</p>
                     </div>
                   </div>
                   {bookmark.is_fav && (
-                    <Star className="h-4 w-4 text-warning fill-warning" />
+                    <Star className="h-4 w-4 text-warning fill-warning flex-shrink-0" />
                   )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center text-muted-foreground py-8">
+            <div className="text-center text-muted-foreground py-6 md:py-8">
               No bookmarks yet. Start adding some!
             </div>
           )}
         </Card>
 
         {/* Trending Tags */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Trending Tags</h2>
+        <Card className="p-4 md:p-6 w-full max-w-full">
+          <h2 className="text-lg md:text-xl font-semibold mb-4">Trending Tags</h2>
           <div className="flex flex-wrap gap-2">
             {["Development", "Design", "Marketing", "AI", "Productivity"].map((tag) => (
               <span
